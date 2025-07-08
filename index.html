@@ -3,40 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D CFD Viewer</title>
+    <title>Interactive 3D CFD Viewer - Comparison</title>
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f0f0f0; color: #333; overflow: hidden; }
+        #main-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+        .view-container {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            border-left: 1px solid #ccc;
+        }
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+        }
         canvas { display: block; }
-        #info {
+        .info-panel {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             padding: 1rem;
             box-sizing: border-box;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid #ddd;
         }
         .controls-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
             align-items: center;
+        }
+        .control-group {
+            display: flex;
+            gap: 1rem;
             justify-content: center;
+            flex-wrap: wrap;
         }
         .control {
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 150px;
+            min-width: 120px;
         }
         label {
             font-size: 0.8rem;
             margin-bottom: 0.25rem;
         }
         input[type="range"] {
-            width: 120px;
+            width: 100px;
         }
         button {
             padding: 0.5rem 1rem;
@@ -46,9 +66,18 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-top: 0.5rem;
         }
         button:hover {
             background-color: #0056b3;
+        }
+        .summary-panel {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: bold;
+            background-color: rgba(0,0,0,0.05);
+            padding: 0.5rem;
+            border-radius: 6px;
         }
         .legend {
             position: absolute;
@@ -57,7 +86,7 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
             border-radius: 8px;
-            display: none; /* Hidden by default */
+            display: none;
         }
         .legend-item {
             display: flex;
@@ -76,28 +105,58 @@
 </head>
 <body>
 
-    <div id="info">
-        <div class="controls-container">
-            <div class="control">
-                <label for="width">Width: <span id="width-value">5</span>m</label>
-                <input type="range" id="width" min="1" max="20" value="5" step="1">
+    <div id="main-container">
+        <div id="left-view" class="view-container">
+            <div class="canvas-container" id="canvas-container-left"></div>
+            <div class="info-panel">
+                <div class="controls-container">
+                    <div class="control-group">
+                        <div class="control">
+                            <label for="width-left">Width: <span id="width-value-left">5</span>m</label>
+                            <input type="range" id="width-left" min="0" max="50" value="5" step="1">
+                        </div>
+                        <div class="control">
+                            <label for="height-left">Height: <span id="height-value-left">10.5</span>m</label>
+                            <input type="range" id="height-left" min="0" max="220.5" value="10.5" step="3.5">
+                        </div>
+                        <div class="control">
+                            <label for="depth-left">Depth: <span id="depth-value-left">5</span>m</label>
+                            <input type="range" id="depth-left" min="0" max="50" value="5" step="1">
+                        </div>
+                    </div>
+                    <button id="cfd-toggle-left">Toggle Wind Analysis</button>
+                    <div class="summary-panel" id="summary-left">Comfort (Lawson): N/A</div>
+                </div>
             </div>
-            <div class="control">
-                <label for="height">Height: <span id="height-value">10</span>m</label>
-                <input type="range" id="height" min="1" max="50" value="10" step="1">
+            <div class="legend" id="legend-left">
+                <div class="legend-item"><div class="legend-color"></div><span>Low → High Speed</span></div>
             </div>
-            <div class="control">
-                <label for="depth">Depth: <span id="depth-value">5</span>m</label>
-                <input type="range" id="depth" min="1" max="20" value="5" step="1">
-            </div>
-            <button id="cfd-toggle">Toggle Wind Analysis</button>
         </div>
-    </div>
-
-    <div id="legend" class="legend">
-        <div class="legend-item">
-            <div class="legend-color"></div>
-            <span>Low → High Speed</span>
+        <div id="right-view" class="view-container">
+            <div class="canvas-container" id="canvas-container-right"></div>
+            <div class="info-panel">
+                <div class="controls-container">
+                    <div class="control-group">
+                         <div class="control">
+                            <label for="width-right">Width: <span id="width-value-right">10</span>m</label>
+                            <input type="range" id="width-right" min="0" max="50" value="10" step="1">
+                        </div>
+                        <div class="control">
+                            <label for="height-right">Height: <span id="height-value-right">24.5</span>m</label>
+                            <input type="range" id="height-right" min="0" max="220.5" value="24.5" step="3.5">
+                        </div>
+                        <div class="control">
+                            <label for="depth-right">Depth: <span id="depth-value-right">10</span>m</label>
+                            <input type="range" id="depth-right" min="0" max="50" value="10" step="1">
+                        </div>
+                    </div>
+                    <button id="cfd-toggle-right">Toggle Wind Analysis</button>
+                    <div class="summary-panel" id="summary-right">Comfort (Lawson): N/A</div>
+                </div>
+            </div>
+             <div class="legend" id="legend-right">
+                <div class="legend-item"><div class="legend-color"></div><span>Low → High Speed</span></div>
+            </div>
         </div>
     </div>
 
@@ -105,287 +164,388 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
-        // --- Basic Scene Setup ---
-        let scene, camera, renderer, controls;
-        let buildingGroup;
-        let windLinesGroup;
-        let cfdEnabled = false;
-        const windFlowLines = [];
         const FLOOR_HEIGHT = 3.5;
-        const PATH_CONTROL_POINTS = 50;
-        const LINE_RESOLUTION = 200;
+        const PATH_CONTROL_POINTS = 60;
+        const LINE_RESOLUTION = 250;
 
-        const widthSlider = document.getElementById('width');
-        const heightSlider = document.getElementById('height');
-        const depthSlider = document.getElementById('depth');
-        const widthValue = document.getElementById('width-value');
-        const heightValue = document.getElementById('height-value');
-        const depthValue = document.getElementById('depth-value');
-        const cfdToggleButton = document.getElementById('cfd-toggle');
-        const legend = document.getElementById('legend');
+        class CFDViewer {
+            constructor(viewId) {
+                this.viewId = viewId;
+                this.container = document.getElementById(`canvas-container-${viewId}`);
+                
+                this.widthSlider = document.getElementById(`width-${viewId}`);
+                this.heightSlider = document.getElementById(`height-${viewId}`);
+                this.depthSlider = document.getElementById(`depth-${viewId}`);
+                this.widthValue = document.getElementById(`width-value-${viewId}`);
+                this.heightValue = document.getElementById(`height-value-${viewId}`);
+                this.depthValue = document.getElementById(`depth-value-${viewId}`);
+                this.cfdToggleButton = document.getElementById(`cfd-toggle-${viewId}`);
+                this.summaryElement = document.getElementById(`summary-${viewId}`);
+                this.legendElement = document.getElementById(`legend-${viewId}`);
 
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xffffff);
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.controls = null;
+                this.buildingGroup = null;
+                this.windLinesGroup = null;
+                this.contextBuildings = new THREE.Group();
+                this.cfdEnabled = false;
+                this.windFlowLines = [];
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(-40, 25, 40);
-            camera.lookAt(0, 10, 0);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.target.set(0, 10, 0);
-            controls.enableDamping = true;
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-            directionalLight.position.set(50, 80, 50);
-            scene.add(directionalLight);
-            
-            const groundGeo = new THREE.PlaneGeometry(150, 150);
-            const groundMat = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, side: THREE.DoubleSide });
-            const ground = new THREE.Mesh(groundGeo, groundMat);
-            ground.rotation.x = -Math.PI / 2;
-            scene.add(ground);
-
-            updateBuilding();
-
-            widthSlider.addEventListener('input', onSliderChange);
-            heightSlider.addEventListener('input', onSliderChange);
-            depthSlider.addEventListener('input', onSliderChange);
-            cfdToggleButton.addEventListener('click', toggleCFD);
-            window.addEventListener('resize', onWindowResize, false);
-
-            animate();
-        }
-
-        function updateBuilding() {
-            if (buildingGroup) {
-                scene.remove(buildingGroup);
-                buildingGroup.traverse(child => {
-                    if (child.geometry) child.geometry.dispose();
-                    if (child.material) child.material.dispose();
-                });
+                this.init();
             }
-            
-            buildingGroup = new THREE.Group();
-            
-            const width = parseFloat(widthSlider.value);
-            const height = parseFloat(heightSlider.value);
-            const depth = parseFloat(depthSlider.value);
 
-            const massingGeo = new THREE.BoxGeometry(width, height, depth);
-            const massingMat = new THREE.MeshStandardMaterial({
-                color: 0x007bff,
-                transparent: true,
-                opacity: 0.5,
-                depthWrite: false
-            });
-            const massingMesh = new THREE.Mesh(massingGeo, massingMat);
-            massingMesh.position.y = height / 2;
-            buildingGroup.add(massingMesh);
+            init() {
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0xffffff);
 
-            const lineMat = new THREE.LineBasicMaterial({ color: 0x333333, transparent: true, opacity: 0.7 });
-            const numFloors = Math.floor(height / FLOOR_HEIGHT);
-            for (let i = 1; i <= numFloors; i++) {
-                const y = i * FLOOR_HEIGHT;
-                if (y < height) {
-                    const points = [
-                        new THREE.Vector3(-width / 2, y, -depth / 2),
-                        new THREE.Vector3(width / 2, y, -depth / 2),
-                        new THREE.Vector3(width / 2, y, depth / 2),
-                        new THREE.Vector3(-width / 2, y, depth / 2),
-                        new THREE.Vector3(-width / 2, y, -depth / 2)
-                    ];
-                    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-                    const floorLine = new THREE.Line(lineGeo, lineMat);
-                    buildingGroup.add(floorLine);
+                const { width, height } = this.container.getBoundingClientRect();
+                this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1500);
+                this.camera.position.set(-80, 80, 80);
+                this.camera.lookAt(0, 10, 0);
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(width, height);
+                this.container.appendChild(this.renderer.domElement);
+
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.target.set(0, 10, 0);
+                this.controls.enableDamping = true;
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                this.scene.add(ambientLight);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+                directionalLight.position.set(100, 100, 50);
+                this.scene.add(directionalLight);
+                
+                const groundGeo = new THREE.PlaneGeometry(500, 500);
+                const groundMat = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, side: THREE.DoubleSide });
+                const ground = new THREE.Mesh(groundGeo, groundMat);
+                ground.rotation.x = -Math.PI / 2;
+                this.scene.add(ground);
+
+                this.createCityContext();
+                this.updateBuilding();
+
+                this.widthSlider.addEventListener('input', () => this.onSliderChange());
+                this.heightSlider.addEventListener('input', () => this.onSliderChange());
+                this.depthSlider.addEventListener('input', () => this.onSliderChange());
+                this.cfdToggleButton.addEventListener('click', () => this.toggleCFD());
+            }
+
+            createCityContext() {
+                const contextMat = new THREE.MeshStandardMaterial({ color: 0xcccccc });
+                const gridSize = 4;
+                const basePlotSize = 35;
+
+                for (let i = -gridSize; i <= gridSize; i++) {
+                    for (let j = -gridSize; j <= gridSize; j++) {
+                        if (i === 0 && j === 0) continue; 
+
+                        const height = 20 + Math.random() * 100;
+                        const width = basePlotSize * (0.5 + Math.random() * 0.7);
+                        const depth = basePlotSize * (0.5 + Math.random() * 0.7);
+                        
+                        const buildingGeo = new THREE.BoxGeometry(width, height, depth);
+                        const building = new THREE.Mesh(buildingGeo, contextMat);
+                        
+                        const cell_size = basePlotSize + 25;
+                        const posX = i * cell_size + (Math.random() - 0.5) * 15;
+                        const posZ = j * cell_size + (Math.random() - 0.5) * 15;
+
+                        building.position.set(posX, height / 2, posZ);
+                        this.contextBuildings.add(building);
+                    }
                 }
+                this.scene.add(this.contextBuildings);
             }
-            scene.add(buildingGroup);
+
+            updateBuilding() {
+                if (this.buildingGroup) {
+                    this.scene.remove(this.buildingGroup);
+                    this.buildingGroup.traverse(child => {
+                        if (child.geometry) child.geometry.dispose();
+                        if (child.material) child.material.dispose();
+                    });
+                }
+                
+                this.buildingGroup = new THREE.Group();
+                
+                const width = parseFloat(this.widthSlider.value);
+                const height = parseFloat(this.heightSlider.value);
+                const depth = parseFloat(this.depthSlider.value);
+
+                const massingGeo = new THREE.BoxGeometry(width, height, depth);
+                const massingMat = new THREE.MeshStandardMaterial({
+                    color: 0x007bff,
+                    transparent: true,
+                    opacity: 0.5,
+                    depthWrite: false
+                });
+                const massingMesh = new THREE.Mesh(massingGeo, massingMat);
+                massingMesh.position.y = height / 2;
+                this.buildingGroup.add(massingMesh);
+
+                const lineMat = new THREE.LineBasicMaterial({ color: 0x333333, transparent: true, opacity: 0.7 });
+                const numFloors = Math.floor(height / FLOOR_HEIGHT);
+                for (let i = 1; i <= numFloors; i++) {
+                    const y = i * FLOOR_HEIGHT;
+                    if (y < height) {
+                        const points = [
+                            new THREE.Vector3(-width / 2, y, -depth / 2),
+                            new THREE.Vector3(width / 2, y, -depth / 2),
+                            new THREE.Vector3(width / 2, y, depth / 2),
+                            new THREE.Vector3(-width / 2, y, depth / 2),
+                            new THREE.Vector3(-width / 2, y, -depth / 2)
+                        ];
+                        const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                        const floorLine = new THREE.Line(lineGeo, lineMat);
+                        this.buildingGroup.add(floorLine);
+                    }
+                }
+                this.scene.add(this.buildingGroup);
+                
+                this.createWindFlow();
+            }
             
-            createWindFlow();
-        }
+            calculateControlPoints(startY, startZ, allBuildingBoxes) {
+                const controlPointsData = [];
+                let currentPos = new THREE.Vector3(200, startY, startZ);
+                const stepSize = 400 / PATH_CONTROL_POINTS;
 
-        function calculateControlPoints(startY, startZ, buildingBox) {
-            const controlPointsData = [];
-            let currentPos = new THREE.Vector3(70, startY, startZ);
-            const bHeight = buildingBox.max.y;
-            const bDepth = buildingBox.max.z - buildingBox.min.z;
-            const stepSize = 140 / PATH_CONTROL_POINTS;
+                for (let i = 0; i < PATH_CONTROL_POINTS; i++) {
+                    let totalDeflection = new THREE.Vector3();
 
-            for (let i = 0; i < PATH_CONTROL_POINTS; i++) {
-                let speedFactor = 1.0;
-                let velocity = new THREE.Vector3(-stepSize, 0, 0); 
+                    for (const box of allBuildingBoxes) {
+                        const center = box.getCenter(new THREE.Vector3());
+                        const size = box.getSize(new THREE.Vector3());
+                        const influenceRadius = (size.x + size.z) / 2 + 20; 
+                        
+                        const toCenter = new THREE.Vector3().subVectors(currentPos, center);
+                        const distance = toCenter.length();
 
-                const influenceBox = buildingBox.clone().expandByScalar(10); // Zone of influence
-
-                if (influenceBox.containsPoint(currentPos)) {
-                    const distToSurfaceY = currentPos.y - buildingBox.max.y;
-                    const distToSurfaceZ = Math.abs(currentPos.z) - bDepth / 2;
-
-                    // Deflect over the top
-                    if (currentPos.y < bHeight && distToSurfaceY < 10) {
-                        const push = Math.pow(1 - (distToSurfaceY / 10), 2) * 0.3 * stepSize;
-                        velocity.y += push;
-                        speedFactor += push * 1.5;
+                        if (distance < influenceRadius) {
+                            const pushForce = Math.pow(1 - (distance / influenceRadius), 1.5) * stepSize * 1.5;
+                            const pushDirection = toCenter.normalize();
+                            totalDeflection.add(pushDirection.multiplyScalar(pushForce));
+                        }
                     }
                     
-                    // Deflect around the sides
-                    if (distToSurfaceZ < 10) {
-                         const push = Math.pow(1 - (distToSurfaceZ / 10), 2) * 0.4 * stepSize;
-                         velocity.z += (currentPos.z > 0 ? 1 : -1) * push;
-                         speedFactor += push * 2.0;
+                    let velocity = new THREE.Vector3(-stepSize, 0, 0);
+                    velocity.add(totalDeflection);
+                    
+                    let speedFactor = 1.0 + totalDeflection.length() * 0.5;
+
+                    currentPos.add(velocity);
+                    
+                    for (const box of allBuildingBoxes) {
+                        if (box.containsPoint(currentPos)) {
+                            const center = box.getCenter(new THREE.Vector3());
+                            const direction = new THREE.Vector3().subVectors(currentPos, center).normalize();
+                            const ray = new THREE.Ray(center, direction);
+                            const intersection = ray.intersectBox(box, new THREE.Vector3());
+                            if (intersection) {
+                                currentPos.copy(intersection).add(direction.multiplyScalar(0.1));
+                            }
+                        }
+                    }
+                    
+                    controlPointsData.push({ point: currentPos.clone(), speed: speedFactor });
+                }
+                return controlPointsData;
+            }
+
+            createWindFlow() {
+                if (this.windLinesGroup) {
+                    this.scene.remove(this.windLinesGroup);
+                    this.windLinesGroup.traverse(child => {
+                        if (child.geometry) child.geometry.dispose();
+                        if (child.material) child.material.dispose();
+                    });
+                }
+                this.windLinesGroup = new THREE.Group();
+                this.windFlowLines.length = 0;
+                
+                const buildingBox = new THREE.Box3().setFromObject(this.buildingGroup);
+                const allBuildingBoxes = [buildingBox, ...this.contextBuildings.children.map(b => new THREE.Box3().setFromObject(b))];
+                
+                const windFieldWidth = 200;
+                const windFieldHeight = 150;
+                const lineDensity = 10;
+                
+                const numLinesY = Math.floor(windFieldHeight / lineDensity);
+                const numLinesZ = Math.floor(windFieldWidth / lineDensity);
+
+                for (let y = 0; y < numLinesY; y++) {
+                    for (let z = 0; z < numLinesZ; z++) {
+                        const startY = (y / numLinesY) * windFieldHeight;
+                        const startZ = (z / numLinesZ - 0.5) * windFieldWidth;
+                        
+                        const controlPointsData = this.calculateControlPoints(startY, startZ, allBuildingBoxes);
+                        const controlPoints = controlPointsData.map(d => d.point);
+                        const controlSpeeds = controlPointsData.map(d => d.speed);
+
+                        const curve = new THREE.CatmullRomCurve3(controlPoints);
+                        const pathPoints = curve.getPoints(LINE_RESOLUTION);
+                        
+                        const staticColors = [];
+                        const green = new THREE.Color(0x00ff00);
+                        const orange = new THREE.Color(0xffa500);
+                        const red = new THREE.Color(0xff0000);
+
+                        for (let j = 0; j < pathPoints.length; j++) {
+                            const t = j / (pathPoints.length - 1);
+                            const controlIndex = Math.floor(t * (controlSpeeds.length - 1));
+                            const nextControlIndex = Math.min(controlIndex + 1, controlSpeeds.length - 1);
+                            const segmentT = (t * (controlSpeeds.length - 1)) - controlIndex;
+                            const speed = controlSpeeds[controlIndex] * (1 - segmentT) + controlSpeeds[nextControlIndex] * segmentT;
+
+                            const color = new THREE.Color();
+                            if (speed > 1.8) {
+                                const amount = Math.min((speed - 1.8) / 0.7, 1.0);
+                                color.copy(orange).lerp(red, amount);
+                            } else if (speed > 1.2) {
+                                const amount = (speed - 1.2) / 0.6;
+                                color.copy(green).lerp(orange, amount);
+                            } else {
+                                color.copy(green);
+                            }
+                            staticColors.push(color);
+                        }
+
+                        const geometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
+                        const colors = new Float32Array(pathPoints.length * 3);
+                        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+                        const material = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.5, linewidth: 1 });
+                        const line = new THREE.Line(geometry, material);
+                        
+                        this.windFlowLines.push({
+                            line: line,
+                            pathPoints: pathPoints,
+                            controlSpeeds: controlSpeeds,
+                            staticColors: staticColors,
+                            flowOffset: Math.floor(Math.random() * pathPoints.length)
+                        });
+                        this.windLinesGroup.add(line);
                     }
                 }
+                this.windLinesGroup.visible = this.cfdEnabled;
+                this.scene.add(this.windLinesGroup);
                 
-                // Wake zone
-                if (currentPos.x < buildingBox.min.x && currentPos.x > buildingBox.min.x - 30 && currentPos.y < bHeight) {
-                   if (Math.abs(currentPos.z) < bDepth) {
-                       speedFactor *= 0.4; // Slow down in the wake
-                   }
-                }
-                
-                currentPos.add(velocity);
-
-                // Final check to prevent any accidental entry
-                if (buildingBox.containsPoint(currentPos)) {
-                    buildingBox.clampPoint(currentPos, currentPos);
-                }
-                
-                controlPointsData.push({ point: currentPos.clone(), speed: speedFactor });
+                this.calculateComfortMetric();
             }
-            return controlPointsData;
-        }
 
-        function createWindFlow() {
-            if (windLinesGroup) {
-                scene.remove(windLinesGroup);
-                windLinesGroup.traverse(child => {
-                    if (child.geometry) child.geometry.dispose();
-                    if (child.material) child.material.dispose();
+            calculateComfortMetric() {
+                const centralPlotSize = 50;
+                const streetLevelBox = new THREE.Box3(
+                    new THREE.Vector3(-centralPlotSize / 2, 0, -centralPlotSize / 2),
+                    new THREE.Vector3(centralPlotSize / 2, 2.5, centralPlotSize / 2)
+                );
+
+                let maxStreetSpeed = 0;
+                const BASE_WIND_MS = 5.0;
+
+                this.windFlowLines.forEach(lineObj => {
+                    for (let i = 0; i < lineObj.pathPoints.length; i++) {
+                        const point = lineObj.pathPoints[i];
+                        if (streetLevelBox.containsPoint(point)) {
+                            const t = i / (lineObj.pathPoints.length - 1);
+                            const controlIndex = Math.floor(t * (lineObj.controlSpeeds.length - 1));
+                            const nextControlIndex = Math.min(controlIndex + 1, lineObj.controlSpeeds.length - 1);
+                            const segmentT = (t * (lineObj.controlSpeeds.length - 1)) - controlIndex;
+                            const speedFactor = lineObj.controlSpeeds[controlIndex] * (1 - segmentT) + lineObj.controlSpeeds[nextControlIndex] * segmentT;
+                            
+                            const windSpeed_ms = speedFactor * BASE_WIND_MS;
+                            if (windSpeed_ms > maxStreetSpeed) {
+                                maxStreetSpeed = windSpeed_ms;
+                            }
+                        }
+                    }
+                });
+
+                let comfortCategory = "N/A";
+                let comfortDescription = "";
+                if (maxStreetSpeed < 4) {
+                    comfortCategory = "A";
+                    comfortDescription = "Comfortable for Sitting";
+                } else if (maxStreetSpeed < 6) {
+                    comfortCategory = "B";
+                    comfortDescription = "Comfortable for Standing";
+                } else if (maxStreetSpeed < 8) {
+                    comfortCategory = "C";
+                    comfortDescription = "Comfortable for Walking";
+                } else {
+                    comfortCategory = "D";
+                    comfortDescription = "Uncomfortable";
+                }
+                this.summaryElement.textContent = `Comfort (Lawson): ${comfortCategory} - ${comfortDescription} (Max: ${maxStreetSpeed.toFixed(1)} m/s)`;
+            }
+            
+            updateWind() {
+                if (!this.cfdEnabled || !this.windLinesGroup) return;
+
+                this.windFlowLines.forEach(lineObj => {
+                    lineObj.flowOffset = (lineObj.flowOffset + 1) % lineObj.staticColors.length;
+                    const colorAttribute = lineObj.line.geometry.attributes.color;
+                    for (let i = 0; i < lineObj.staticColors.length; i++) {
+                        const sourceIndex = (i + lineObj.flowOffset) % lineObj.staticColors.length;
+                        const color = lineObj.staticColors[sourceIndex];
+                        if (color) {
+                            colorAttribute.setXYZ(i, color.r, color.g, color.b);
+                        }
+                    }
+                    colorAttribute.needsUpdate = true;
                 });
             }
-            windLinesGroup = new THREE.Group();
-            windFlowLines.length = 0;
-            
-            const buildingBox = new THREE.Box3().setFromObject(buildingGroup);
-            const bDepth = buildingBox.max.z - buildingBox.min.z;
-            const windFieldWidth = bDepth + 50;
-            const lineCount = 150;
 
-            for (let i = 0; i < lineCount; i++) {
-                const startY = Math.random() * 40;
-                const startZ = (Math.random() - 0.5) * windFieldWidth;
-                
-                const controlPointsData = calculateControlPoints(startY, startZ, buildingBox);
-                const controlPoints = controlPointsData.map(d => d.point);
-                const controlSpeeds = controlPointsData.map(d => d.speed);
-
-                const curve = new THREE.CatmullRomCurve3(controlPoints);
-                const pathPoints = curve.getPoints(LINE_RESOLUTION);
-                
-                const staticColors = [];
-                const green = new THREE.Color(0x00ff00);
-                const orange = new THREE.Color(0xffa500);
-                const red = new THREE.Color(0xff0000);
-
-                for (let j = 0; j < pathPoints.length; j++) {
-                    const t = j / (pathPoints.length - 1);
-                    const controlIndex = Math.floor(t * (controlSpeeds.length - 1));
-                    const nextControlIndex = Math.min(controlIndex + 1, controlSpeeds.length - 1);
-                    const segmentT = (t * (controlSpeeds.length - 1)) - controlIndex;
-                    const speed = controlSpeeds[controlIndex] * (1 - segmentT) + controlSpeeds[nextControlIndex] * segmentT;
-
-                    const color = new THREE.Color();
-                    if (speed > 1.4) {
-                        // Interpolate between orange and red
-                        const amount = Math.min((speed - 1.4) / 0.5, 1.0); // Normalize between 1.4 and 1.9
-                        color.copy(orange).lerp(red, amount);
-                    } else if (speed > 1.1) {
-                        // Interpolate between green and orange
-                        const amount = (speed - 1.1) / 0.3; // Normalize between 1.1 and 1.4
-                        color.copy(green).lerp(orange, amount);
-                    } else {
-                        color.copy(green);
-                    }
-                    staticColors.push(color);
-                }
-
-                const geometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
-                const colors = new Float32Array(pathPoints.length * 3);
-                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-                const material = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.7 });
-                const line = new THREE.Line(geometry, material);
-                
-                const lineObject = {
-                    line: line,
-                    staticColors: staticColors,
-                    flowOffset: Math.floor(Math.random() * pathPoints.length)
-                };
-
-                windFlowLines.push(lineObject);
-                windLinesGroup.add(line);
+            onSliderChange() {
+                this.widthValue.textContent = this.widthSlider.value;
+                this.heightValue.textContent = this.heightSlider.value;
+                this.depthValue.textContent = this.depthSlider.value;
+                this.updateBuilding();
             }
-            windLinesGroup.visible = cfdEnabled;
-            scene.add(windLinesGroup);
-        }
-        
-        function updateWind() {
-            if (!cfdEnabled || !windLinesGroup) return;
 
-            windFlowLines.forEach(lineObj => {
-                lineObj.flowOffset = (lineObj.flowOffset + 1) % lineObj.staticColors.length;
-                
-                const colorAttribute = lineObj.line.geometry.attributes.color;
-                
-                for (let i = 0; i < lineObj.staticColors.length; i++) {
-                    const sourceIndex = (i + lineObj.flowOffset) % lineObj.staticColors.length;
-                    const color = lineObj.staticColors[sourceIndex];
-                    if (color) {
-                        colorAttribute.setXYZ(i, color.r, color.g, color.b);
-                    }
+            toggleCFD() {
+                this.cfdEnabled = !this.cfdEnabled;
+                this.windLinesGroup.visible = this.cfdEnabled;
+                this.legendElement.style.display = this.cfdEnabled ? 'block' : 'none';
+                this.cfdToggleButton.textContent = this.cfdEnabled ? 'Stop Analysis' : 'Start Wind Analysis';
+            }
+
+            onResize() {
+                const { width, height } = this.container.getBoundingClientRect();
+                this.camera.aspect = width / height;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(width, height);
+            }
+
+            animate() {
+                this.controls.update();
+                if (this.cfdEnabled) {
+                    this.updateWind();
                 }
-                
-                colorAttribute.needsUpdate = true;
-            });
+                this.renderer.render(this.scene, this.camera);
+            }
         }
 
-        function onSliderChange() {
-            widthValue.textContent = widthSlider.value;
-            heightValue.textContent = heightSlider.value;
-            depthValue.textContent = depthSlider.value;
-            updateBuilding();
-        }
-
-        function toggleCFD() {
-            cfdEnabled = !cfdEnabled;
-            windLinesGroup.visible = cfdEnabled;
-            legend.style.display = cfdEnabled ? 'block' : 'none';
-            cfdToggleButton.textContent = cfdEnabled ? 'Stop Analysis' : 'Start Wind Analysis';
-        }
+        const viewerLeft = new CFDViewer('left');
+        const viewerRight = new CFDViewer('right');
 
         function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            viewerLeft.onResize();
+            viewerRight.onResize();
         }
+        window.addEventListener('resize', onWindowResize, false);
 
         function animate() {
             requestAnimationFrame(animate);
-            controls.update();
-            if (cfdEnabled) {
-                updateWind();
-            }
-            renderer.render(scene, camera);
+            viewerLeft.animate();
+            viewerRight.animate();
         }
 
-        init();
+        animate();
     </script>
 </body>
 </html>
